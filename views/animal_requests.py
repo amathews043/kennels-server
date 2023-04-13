@@ -59,7 +59,7 @@ def get_single_animal(id):
         # Dictionaries in Python use [] notation to find a key
         # instead of the dot notation that JavaScript used.
         if animal["id"] == id:
-            requested_animal = animal
+            requested_animal = animal.copy()
             matching_location = get_single_location(requested_animal["locationId"])
             requested_animal["location"] = matching_location
             matching_customer = get_single_customer(requested_animal["customerId"])
