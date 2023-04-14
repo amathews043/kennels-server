@@ -98,7 +98,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Convert JSON string to a Python dictionary
         post_body = json.loads(post_body)
-        print(type(post_body))
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
