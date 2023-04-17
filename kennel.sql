@@ -64,4 +64,6 @@ INSERT INTO `Animal` VALUES (null, "Curly", "Treatment", "Poodle", 4, 2);
 -- Get only the animal rows where the `id` field value is 3
 SELECT
 	*
-FROM location 
+FROM Customer
+
+INSERT INTO `Animal` VALUES (null, "Daps", "Kennel", "Boxer", 2, 2);

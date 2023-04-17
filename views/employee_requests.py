@@ -79,19 +79,15 @@ def create_employee(employee):
     return employee
 
 def delete_employee(id):
-    # Initial -1 value for employee index, in case one isn't found
-    employee_index = -1
+    """ Deletes an employee record"""
+    with sqlite3.connect("./kennel.sqlite3") as conn: 
+        db_cursor = conn.cursor()
 
-    # Iterate the EMPLOYEES list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            # Found the employee. Store the current index.
-            employee_index = index
+        db_cursor.execute("""
+        DELETE FROM employee
+        WHERE id = ?
+        """, (id, ))
 
-    # If the employee was found, use pop(int) to remove it from list
-    if employee_index >= 0:
-        EMPLOYEES.pop(employee_index)
 
 def update_employee(id, new_employee):
     # Iterate the employeeS list, but use enumerate() so that
@@ -101,3 +97,26 @@ def update_employee(id, new_employee):
             # Found the employee. Update the value.
             EMPLOYEES[index] = new_employee
             break
+
+def get_employee_by_location(location_id): 
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT 
+            e.id,
+            e.name, 
+            e.address, 
+            e.location_id
+        FROM Employee e
+        WHERE e.location_id = ?
+        """, (location_id, ))
+
+        employees = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset: 
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+            employees.append(employee.__dict__)
+    return employees

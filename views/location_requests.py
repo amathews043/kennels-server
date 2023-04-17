@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-from models import Location
+from models import Location, Animal
 
 LOCATIONS = [
     {
@@ -82,19 +82,16 @@ def create_location(location):
     return location
 
 def delete_location(id):
-    # Initial -1 value for animal index, in case one isn't found
-    location_index = -1
+    """delete a location record"""
 
-    # Iterate the ANIMALS list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, location in enumerate(LOCATIONS):
-        if location["id"] == id:
-            # Found the location. Store the current index.
-            location_index = index
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # If the location was found, use pop(int) to remove it from list
-    if location_index >= 0:
-        LOCATIONS.pop(location_index)
+        db_cursor.execute("""
+        DELETE FROM location
+        WHERE id = ?
+        """, (id, ))
+
 
 def update_location(id, new_location):
     # Iterate the locationS list, but use enumerate() so that
@@ -104,3 +101,28 @@ def update_location(id, new_location):
             # Found the location. Update the value.
             LOCATIONS[index] = new_location
             break
+
+def get_animals_by_location(location_id):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT 
+            a.id,
+            a.name, 
+            a.status, 
+            a.breed, 
+            a.location_id,
+            a.customer_id
+        FROM Animal a
+        WHERE a.location_id = ?
+        """, (location_id, ))
+
+        animals = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset: 
+            animal = Animal(row['id'], row['name'], row['status'], row['breed'], row['location_id'], row['customer_id'])
+            animals.append(animal.__dict__)
+    return animals
