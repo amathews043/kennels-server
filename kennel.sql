@@ -67,3 +67,21 @@ SELECT
 FROM Customer
 
 INSERT INTO `Animal` VALUES (null, "Daps", "Kennel", "Boxer", 2, 2);
+
+SELECT
+    a.id,
+    a.name,
+    a.breed,
+    a.status,
+    a.location_id,
+    a.customer_id,
+    l.name location_name,
+    l.address location_address, 
+	c.name customer_name 
+FROM Animal a
+JOIN Location l 
+    ON l.id = a.location_id 
+JOIN Customer c 
+	ON c.id = a.customer_id
+
+SELECT * FROM Customer

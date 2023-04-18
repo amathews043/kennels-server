@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-from models import Employee
+from models import Employee, Location
 
 EMPLOYEES = [
     {
@@ -25,8 +25,12 @@ def get_all_employees():
             a.id, 
             a.name, 
             a.address, 
-            a.location_id
-        FROM employee a 
+            a.location_id,
+            l.name as location_name,
+            l.address as location_address
+        FROM Employee a 
+        JOIN Location l
+            on a.location_id = l.id
         """)
 
         employees = []
@@ -35,7 +39,9 @@ def get_all_employees():
 
         for row in dataset:
             employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+            location = Location(row['location_id'], row['location_name'], row['location_address'])
 
+            employee.location = location.__dict__
             employees.append(employee.__dict__)
 
         return employees
@@ -90,13 +96,27 @@ def delete_employee(id):
 
 
 def update_employee(id, new_employee):
-    # Iterate the employeeS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            # Found the employee. Update the value.
-            EMPLOYEES[index] = new_employee
-            break
+    """Updates an existing employee record"""
+    with sqlite3.connect("./kennelsqlite3") as conn: 
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+            UPDATE Employee
+                SET 
+                    name = ?, 
+                    address = ?, 
+                    location_id = ?
+            WHERE id = ? 
+        """, (new_employee['name'], new_employee['address'], new_employee['location_id'], id))
+
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        return False 
+    else: 
+        return True
+    
+
 
 def get_employee_by_location(location_id): 
     with sqlite3.connect("./kennel.sqlite3") as conn:
