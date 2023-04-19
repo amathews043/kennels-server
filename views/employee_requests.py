@@ -68,21 +68,24 @@ def get_single_employee(id):
     
             return employee.__dict__
 
-def create_employee(employee):
-    # Get the id value of the last employee in the list
-    max_id = EMPLOYEES[-1]["id"]
+def create_employee(new_employee):
+    """ creates a new employee record """
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # Add an `id` property to the animal dictionary
-    employee["id"] = new_id
+        db_cursor.execute("""
+        INSERT INTO Employee
+            ( name, address, location_id )
+        VALUES 
+            ( ?, ?, ?);
+        """, (new_employee['name'], new_employee['address'], new_employee['location_id'], ))
 
-    # Add the animal dictionary to the list
-    EMPLOYEES.append(employee)
+        id = db_cursor.lastrowid
 
-    # Return the dictionary with `id` property added
-    return employee
+        new_employee['id'] = id
+
+    return new_employee
 
 def delete_employee(id):
     """ Deletes an employee record"""

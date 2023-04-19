@@ -84,4 +84,4 @@ JOIN Location l
 JOIN Customer c 
 	ON c.id = a.customer_id
 
-SELECT * FROM Animal ORDER BY id DESC;
+SELECT * FROM Employee ORDER BY id DESC;
