@@ -155,7 +155,6 @@ def delete_animal(id):
         """, (id, ))
 
 def update_animal(id, new_animal):
-    print(new_animal)
     with sqlite3.connect("./kennel.sqlite3") as conn:
         db_cursor = conn.cursor()
 
