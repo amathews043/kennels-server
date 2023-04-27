@@ -34,7 +34,7 @@ ANIMALS = [
 ]
 
 
-def get_all_animals():
+def get_all_animals(query_params={}):
     # Open a connection to the database
     with sqlite3.connect("./kennel.sqlite3") as conn:
 
@@ -42,8 +42,24 @@ def get_all_animals():
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
+        sort_by = ""
+        where_clause = ""
+
+        if '_sortBy' in query_params:
+            if query_params['_sortBy'][0] == "location":
+                sort_by = " ORDER BY a.location_id"
+            elif query_params['_sortBy'][0] == "customer":
+                sort_by = " ORDER BY a.customer_id"
+            elif query_params['_sortBy'][0] == "status":
+                sort_by = " ORDER BY a.status"
+        if 'locationId' in query_params: 
+            where_clause = f"WHERE a.location_id = {query_params['locationId'][0]}"
+        elif 'status' in query_params: 
+            where_clause = f"WHERE a.status = {query_params['status'][0]}"
+
+
         # Write the SQL query to get the information you want
-        db_cursor.execute("""
+        db_cursor.execute(f"""
         SELECT
             a.id as animal_id,
             a.name,
@@ -61,6 +77,8 @@ def get_all_animals():
             ON l.id = a.location_id
         JOIN Customer c 
             on c.id = a.customer_id
+        {where_clause}
+        {sort_by}
         """)
 
         # Initialize an empty list to hold all animal representations

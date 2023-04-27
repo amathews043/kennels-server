@@ -23,9 +23,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         query_params = {}
 
         if url_components.query != '':
-            for param in url_components.query.split("&"):
-                key, value = param.split("=")
-                query_params[key] = value
+            query_params = parse_qs(url_components.query)
 
         resource = path_params[0]
         id = None
@@ -96,7 +94,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             self._set_headers(200)
 
             if 'email' in query_params and resource == 'customers':
-                response = get_customers_by_email(query_params['email'])
+                response = get_customers_by_email(query_params['email'][0])
 
             if 'location_id' in query_params and resource == 'animals':
                 response = get_animals_by_location(query_params['location_id'][0])
@@ -106,6 +104,12 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             if 'status' in query_params and resource == 'animals':
                 response = get_animal_by_status(query_params['status'][0])
+
+            if '_sortBy' in query_params and resource == 'animals':
+                response = get_all_animals(query_params)
+            
+            if 'locationId' in query_params and resource == 'animals':
+                response = get_all_animals(query_params)
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -120,7 +124,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         # Initialize new animal
         response = {}
@@ -204,7 +208,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         response = {}
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         # Delete a single animal from the list
         if resource == "animals":
@@ -235,7 +239,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         success = False
 

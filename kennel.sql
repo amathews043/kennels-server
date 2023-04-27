@@ -85,3 +85,10 @@ JOIN Customer c
 	ON c.id = a.customer_id
 
 SELECT * FROM Employee ORDER BY id DESC;
+
+
+            SELECT COUNT(a.name)
+            FROM animal a
+            WHERE location_id = 2
+
+
